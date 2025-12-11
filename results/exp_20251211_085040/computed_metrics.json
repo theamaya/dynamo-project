@@ -9,27 +9,30 @@
       "overall": 1.0,
       "reads": 1.0,
       "writes": 1.0,
-      "ops": 900
+      "ops": 168
     },
     "failure": {
       "overall": 1.0,
       "reads": 1.0,
       "writes": 1.0,
-      "ops": 182
+      "ops": 302
     },
     "recovery": {
       "overall": 1.0,
       "reads": 1.0,
       "writes": 1.0,
-      "ops": 2757
+      "ops": 501
     }
   },
   "consistency": {
-    "empty_reads": 0,
+    "empty_reads": 398,
     "multi_version_reads": 1,
-    "ryw_violations": 74,
+    "ryw_violations": 0,
     "monotonic_read_violations": 0,
-    "monotonic_write_violations": 171
+    "monotonic_write_violations": 9,
+    "stale_reads": 1,
+    "stale_read_rate": 0.010869565217391304,
+    "stale_reads_checked": 92
   },
-  "total_ops": 3839
+  "total_ops": 971
 }
