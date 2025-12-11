@@ -1,0 +1,38 @@
+{
+  "availability": {
+    "overall": 1.0,
+    "reads": 1.0,
+    "writes": 1.0
+  },
+  "availability_by_window": {
+    "warmup": {
+      "overall": 1.0,
+      "reads": 1.0,
+      "writes": 1.0,
+      "ops": 940
+    },
+    "failure": {
+      "overall": 1.0,
+      "reads": 1.0,
+      "writes": 1.0,
+      "ops": 157
+    },
+    "recovery": {
+      "overall": 1.0,
+      "reads": 1.0,
+      "writes": 1.0,
+      "ops": 2764
+    }
+  },
+  "consistency": {
+    "empty_reads": 0,
+    "multi_version_reads": 1,
+    "ryw_violations": 61,
+    "monotonic_read_violations": 0,
+    "monotonic_write_violations": 181,
+    "stale_reads": 6,
+    "stale_read_rate": 0.005649717514124294,
+    "stale_reads_checked": 1062
+  },
+  "total_ops": 3861
+}

@@ -1,0 +1,18 @@
+{
+  "cluster_procs": "cluster_procs.json",
+  "workload": "A",
+  "duration": 60,
+  "concurrency": 10,
+  "dist": "uniform",
+  "keyspace": 1000,
+  "warmup": 10,
+  "failure_mode": "crash",
+  "failure_duration": 20,
+  "crash_count": 3,
+  "slow_ms": 200,
+  "post_repair": false,
+  "max_repair_rounds": 10,
+  "N": 3,
+  "partition_ms": 60000,
+  "compute_metrics": true
+}
