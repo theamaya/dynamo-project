@@ -1,0 +1,25 @@
+[script] launching cluster...
+[script] cluster_procs.json found after 24 attempts
+[script] running experiment...
+[driver] loaded cluster from /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r1_w3_single_partition/cluster_procs.json
+[driver] cluster has 30 nodes
+[driver] first 5 nodes: 127.0.0.1:40000, 127.0.0.1:40001, 127.0.0.1:40002, 127.0.0.1:40003, 127.0.0.1:40004 ... last 5 nodes: 127.0.0.1:40025, 127.0.0.1:40026, 127.0.0.1:40027, 127.0.0.1:40028, 127.0.0.1:40029
+[driver] created experiment directory: /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r1_w3_single_partition
+[driver] waiting for 30 nodes to be ready...
+[driver] all 30 nodes are ready after 2 attempts
+[driver] prepopulating 200 keys...
+[driver] prepopulation complete.
+[driver] workload started, pid 3141758
+[driver] PARTITIONING node 127.0.0.1:40017
+[driver] we decided not to heal the partition on 127.0.0.1:40017
+[driver] workload finished. saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r1_w3_single_partition/workload.csv
+[driver] computing consistency + availability metrics...
+[driver] metrics saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r1_w3_single_partition/computed_metrics.json
+[script] experiment done; stopping cluster
+[script] cleaning up cluster
+[cleanup] Found 30 node processes to clean up
+[cleanup] Force killing 1 processes that didn't respond to SIGTERM
+[cleanup] All processes terminated successfully
+[script] cleaning up cluster
+[cleanup] Found 30 node processes to clean up
+[cleanup] All processes terminated gracefully

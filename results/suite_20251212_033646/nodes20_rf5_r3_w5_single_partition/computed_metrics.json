@@ -1,0 +1,38 @@
+{
+  "availability": {
+    "overall": 0.9330682571239232,
+    "reads": 0.9487870619946092,
+    "writes": 0.9178617992177314
+  },
+  "availability_by_window": {
+    "warmup": {
+      "overall": 0.9791666666666666,
+      "reads": 1.0,
+      "writes": 0.9586776859504132,
+      "ops": 240
+    },
+    "failure": {
+      "overall": 0.9291964996022275,
+      "reads": 0.9435483870967742,
+      "writes": 0.9152276295133438,
+      "ops": 1257
+    },
+    "recovery": {
+      "overall": 0.4166666666666667,
+      "reads": 0.0,
+      "writes": 0.5555555555555556,
+      "ops": 12
+    }
+  },
+  "consistency": {
+    "empty_reads": 4,
+    "multi_version_reads": 24,
+    "ryw_violations": 12,
+    "monotonic_read_violations": 0,
+    "monotonic_write_violations": 15,
+    "stale_reads": 26,
+    "stale_read_rate": 0.05168986083499006,
+    "stale_reads_checked": 503
+  },
+  "total_ops": 1509
+}

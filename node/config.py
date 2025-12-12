@@ -22,12 +22,12 @@ def parse_args():
     parser.add_argument("--replication_factor", type=int, default=3)
     parser.add_argument("--read_quorum", type=int, default=2)
     parser.add_argument("--write_quorum", type=int, default=2)
-    parser.add_argument("--vnodes_per_node", type=int, default=100)
+    parser.add_argument("--vnodes_per_node", type=int, default=20)
 
-    parser.add_argument("--heartbeat_interval", type=float, default=1.0)
-    parser.add_argument("--ping_timeout", type=float, default=1.5)
+    parser.add_argument("--heartbeat_interval", type=float, default=2.0)
+    parser.add_argument("--ping_timeout", type=float, default=2.0)
 
-    parser.add_argument("--replication_timeout", type=float, default=1.0)
+    parser.add_argument("--replication_timeout", type=float, default=0.7)
     parser.add_argument("--read_timeout", type=float, default=1.0)
 
     parser.add_argument("--debug", action="store_true")

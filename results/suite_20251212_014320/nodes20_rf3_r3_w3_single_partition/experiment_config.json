@@ -1,0 +1,23 @@
+{
+  "cluster_procs": "/n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_014320/nodes20_rf3_r3_w3_single_partition/cluster_procs.json",
+  "nodes": 20,
+  "output_dir": "/n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_014320/nodes20_rf3_r3_w3_single_partition",
+  "workload": "A",
+  "duration": 60,
+  "concurrency": 100,
+  "dist": "uniform",
+  "keyspace": 200,
+  "replication_factor": 3,
+  "read_quorum_r": 3,
+  "write_quorum_w": 3,
+  "warmup": 10,
+  "failure_mode": "single_partition",
+  "failure_duration": 50,
+  "crash_count": 1,
+  "slow_ms": 1000,
+  "post_repair": false,
+  "max_repair_rounds": 10,
+  "N": 3,
+  "partition_ms": 120000,
+  "compute_metrics": true
+}

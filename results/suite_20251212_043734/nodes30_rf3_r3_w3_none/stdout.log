@@ -1,0 +1,23 @@
+[script] launching cluster...
+[script] cluster_procs.json found after 24 attempts
+[script] running experiment...
+[driver] loaded cluster from /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r3_w3_none/cluster_procs.json
+[driver] cluster has 30 nodes
+[driver] first 5 nodes: 127.0.0.1:40000, 127.0.0.1:40001, 127.0.0.1:40002, 127.0.0.1:40003, 127.0.0.1:40004 ... last 5 nodes: 127.0.0.1:40025, 127.0.0.1:40026, 127.0.0.1:40027, 127.0.0.1:40028, 127.0.0.1:40029
+[driver] created experiment directory: /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r3_w3_none
+[driver] waiting for 30 nodes to be ready...
+[driver] all 30 nodes are ready after 2 attempts
+[driver] prepopulating 200 keys...
+[driver] prepopulation complete.
+[driver] workload started, pid 3144218
+[driver] no failure injected
+[driver] workload finished. saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r3_w3_none/workload.csv
+[driver] computing consistency + availability metrics...
+[driver] metrics saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_043734/nodes30_rf3_r3_w3_none/computed_metrics.json
+[script] experiment done; stopping cluster
+[script] cleaning up cluster
+[cleanup] Found 30 node processes to clean up
+[cleanup] All processes terminated gracefully
+[script] cleaning up cluster
+[cleanup] Found 30 node processes to clean up
+[cleanup] All processes terminated gracefully

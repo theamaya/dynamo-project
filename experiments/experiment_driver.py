@@ -351,12 +351,12 @@ def kill_node(pid):
     except Exception as e:
         print("kill error", e)
 
-def start_workload_cmd(args, out_path):
+def start_workload_cmd(args, out_path, nodes_file):
     # returns subprocess.Popen
     import subprocess
     cmd = [
         "python", "experiments/workload.py",
-        "--nodes_file", "all_nodes.txt",
+        "--nodes_file", nodes_file,
         "--workload", args.workload,
         "--duration", str(args.duration),
         "--concurrency", str(args.concurrency),
@@ -439,29 +439,101 @@ def replicas_from_ring(key, all_nodes, N):
         out.append(all_nodes[(idx + i) % len(all_nodes)])
     return out
 
+async def wait_for_nodes_ready(all_nodes, max_attempts=60, delay=0.5):
+    """
+    Wait for all nodes to be ready by pinging them.
+    Returns True if all nodes are ready, False otherwise.
+    """
+    print(f"[driver] waiting for {len(all_nodes)} nodes to be ready...")
+    async with httpx.AsyncClient(timeout=2.0) as client:
+        not_ready_nodes = set(all_nodes)
+        for attempt in range(max_attempts):
+            ready_count = 0
+            tasks = []
+            node_to_task = {}
+            for node in all_nodes:
+                task = client.get(f"http://{node}/ping")
+                tasks.append(task)
+                node_to_task[node] = task
+            
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            for node, result in zip(all_nodes, results):
+                if isinstance(result, httpx.Response) and result.status_code == 200:
+                    ready_count += 1
+                    not_ready_nodes.discard(node)
+            
+            if ready_count == len(all_nodes):
+                print(f"[driver] all {len(all_nodes)} nodes are ready after {attempt + 1} attempts")
+                return True
+            
+            # Print progress every 10 attempts
+            if (attempt + 1) % 10 == 0:
+                print(f"[driver] attempt {attempt + 1}/{max_attempts}: {ready_count}/{len(all_nodes)} nodes ready")
+            
+            if attempt < max_attempts - 1:
+                await asyncio.sleep(delay)
+        
+        print(f"[driver] WARNING: only {ready_count}/{len(all_nodes)} nodes are ready after {max_attempts} attempts")
+        if not_ready_nodes:
+            print(f"[driver] Nodes not ready: {sorted(not_ready_nodes)}")
+        return ready_count == len(all_nodes)
+
 async def prepopulate_cluster(all_nodes, keyspace, initial_value="INIT"):
     """
     Write an initial value to every key in the keyspace.
     Only a single coordinator write is needed per key.
     This function retries failed writes a few times to improve robustness.
     """
+    # Wait for nodes to be ready before prepopulating
+    if not await wait_for_nodes_ready(all_nodes):
+        print("[driver] WARNING: some nodes may not be ready, proceeding with prepopulation anyway")
+    
     print(f"[driver] prepopulating {keyspace} keys...")
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         batch = []
+        failed_keys = []
         for k in range(1, keyspace + 1):
             key = str(k)
             coord = random.choice(all_nodes)
             payload = {"value": initial_value}
-            batch.append(client.put(f"http://{coord}/put/{key}", json=payload))
+            batch.append((key, coord, client.put(f"http://{coord}/put/{key}", json=payload)))
 
             # throttle large bursts
             if len(batch) >= 200:
-                await asyncio.gather(*batch, return_exceptions=True)
+                results = await asyncio.gather(*[req for _, _, req in batch], return_exceptions=True)
+                for (key, coord, _), result in zip(batch, results):
+                    if isinstance(result, Exception) or (isinstance(result, httpx.Response) and result.status_code != 200):
+                        failed_keys.append((key, coord, result))
                 batch = []
 
         if batch:
-            await asyncio.gather(*batch, return_exceptions=True)
+            results = await asyncio.gather(*[req for _, _, req in batch], return_exceptions=True)
+            for (key, coord, _), result in zip(batch, results):
+                if isinstance(result, Exception) or (isinstance(result, httpx.Response) and result.status_code != 200):
+                    failed_keys.append((key, coord, result))
+
+    # Retry failed writes
+    if failed_keys:
+        print(f"[driver] retrying {len(failed_keys)} failed prepopulation writes...")
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            for key, coord, error in failed_keys:
+                try:
+                    payload = {"value": initial_value}
+                    result = await client.put(f"http://{coord}/put/{key}", json=payload)
+                    if result.status_code != 200:
+                        print(f"[driver] WARNING: retry failed for key {key} on {coord}: status {result.status_code}")
+                except Exception as e:
+                    print(f"[driver] WARNING: retry failed for key {key} on {coord}: {e}")
+                    # Try a different coordinator
+                    try:
+                        alt_coord = random.choice([n for n in all_nodes if n != coord])
+                        payload = {"value": initial_value}
+                        result = await client.put(f"http://{alt_coord}/put/{key}", json=payload)
+                        if result.status_code == 200:
+                            print(f"[driver] successfully wrote key {key} via alternate coordinator {alt_coord}")
+                    except Exception as e2:
+                        print(f"[driver] ERROR: failed to prepopulate key {key} even with alternate coordinator: {e2}")
 
     print("[driver] prepopulation complete.")
 
@@ -489,18 +561,32 @@ async def get_replicas_from_server(all_nodes, key, coordinator_index=0):
     return []
 
 async def main(args):
-    cluster = read_cluster_procs(args.cluster_procs)
-    all_nodes = [f"127.0.0.1:{cluster[n]['port']}" for n in cluster.keys()]
-    # write all_nodes.txt for workload script
-    with open("all_nodes.txt", "w") as f:
-        f.write(",".join(all_nodes))
-
     # -------------------------
     # Create experiment result directory
     # -------------------------
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    exp_dir = f"results/exp_{timestamp}"
+    # Use provided output directory, or default to parameter-based naming
+    if hasattr(args, 'output_dir') and args.output_dir:
+        exp_dir = args.output_dir
+    else:
+        # Name directory based on the 5 key parameters
+        exp_dir = f"results/nodes{args.nodes}_rf{args.replication_factor}_r{args.read_quorum_r}_w{args.write_quorum_w}_{args.failure_mode}"
     os.makedirs(exp_dir, exist_ok=True)
+    
+    cluster = read_cluster_procs(args.cluster_procs)
+    all_nodes = [f"127.0.0.1:{cluster[n]['port']}" for n in cluster.keys()]
+    
+    # Debug: print node information
+    print(f"[driver] loaded cluster from {args.cluster_procs}")
+    print(f"[driver] cluster has {len(all_nodes)} nodes")
+    if len(all_nodes) <= 10:
+        print(f"[driver] node addresses: {', '.join(all_nodes)}")
+    else:
+        print(f"[driver] first 5 nodes: {', '.join(all_nodes[:5])} ... last 5 nodes: {', '.join(all_nodes[-5:])}")
+    
+    # write all_nodes.txt for workload script in the experiment directory
+    all_nodes_path = os.path.join(exp_dir, "all_nodes.txt")
+    with open(all_nodes_path, "w") as f:
+        f.write(",".join(all_nodes))
 
     # Save experiment config
     config_path = os.path.join(exp_dir, "experiment_config.json")
@@ -515,7 +601,7 @@ async def main(args):
 
     # start workload subprocess
     out_csv = os.path.join(exp_dir, "workload.csv")
-    p = start_workload_cmd(args, out_csv)
+    p = start_workload_cmd(args, out_csv, all_nodes_path)
     print("[driver] workload started, pid", p.pid)
     # schedule failure injection after warmup
     await asyncio.sleep(args.warmup)
@@ -525,10 +611,16 @@ async def main(args):
     if args.failure_mode == "crash":
         # choose nodes to kill
         crash_count = getattr(args, 'crash_count', 1)
+        # Ensure crash_count is an integer
+        if crash_count is None:
+            crash_count = 1
+        crash_count = int(crash_count)
         available_nodes = list(cluster.keys())
         crash_count = min(crash_count, len(available_nodes))  # Don't crash more than available
         
+        print(f"[driver] crash_count={crash_count}, available_nodes={len(available_nodes)}")
         victims = random.sample(available_nodes, crash_count)
+        print(f"[driver] selected victims: {victims}")
         for victim in victims:
             pid = cluster[victim]["pid"]
             print(f"[driver] killing {victim} (pid {pid})")
@@ -615,11 +707,13 @@ async def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--cluster_procs", type=str, default="cluster_procs.json")
+    parser.add_argument("--nodes", type=int, default=20)
+    parser.add_argument("--output_dir", type=str, default=None, help="Output directory for experiment results (default: auto-generated based on parameters)")
     parser.add_argument("--workload", choices=["A","B"], default="A")
     parser.add_argument("--duration", type=int, default=60)
     parser.add_argument("--concurrency", type=int, default=10)
     parser.add_argument("--dist", choices=["uniform","zipf"], default="uniform")
-    parser.add_argument("--keyspace", type=int, default=1000)
+    parser.add_argument("--keyspace", type=int, default=200)
     parser.add_argument("--replication_factor", type=int, default=3)
     parser.add_argument("--read_quorum_r", type=int, default=2)
     parser.add_argument("--write_quorum_w", type=int, default=2)

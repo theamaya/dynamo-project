@@ -91,7 +91,7 @@ if __name__ == "__main__":
     p.add_argument("--duration", type=int, default=30)
     p.add_argument("--concurrency", type=int, default=10)
     p.add_argument("--dist", choices=["uniform","zipf"], default="uniform")
-    p.add_argument("--keyspace", type=int, default=1000)
+    p.add_argument("--keyspace", type=int, default=200)
     p.add_argument("--out", type=str, default="workload_out.csv")
     args = p.parse_args()
     asyncio.run(run(args))

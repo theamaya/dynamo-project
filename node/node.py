@@ -367,4 +367,6 @@ async def repair_once_endpoint(key: str):
 
 # ---------- Main run helper ----------
 if __name__ == "__main__":
-    uvicorn.run("node:app", host="127.0.0.1", port=PORT)
+    uvicorn.run("node:app", host="127.0.0.1", port=PORT, log_level="warning",
+        access_log=False
+    )

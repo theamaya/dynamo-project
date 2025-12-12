@@ -1,0 +1,25 @@
+[script] launching cluster...
+[script] cluster_procs.json found after 17 attempts
+[script] running experiment...
+[driver] loaded cluster from /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_052928/nodes20_rf3_r2_w2_crash_cc2/cluster_procs.json
+[driver] cluster has 20 nodes
+[driver] first 5 nodes: 127.0.0.1:40000, 127.0.0.1:40001, 127.0.0.1:40002, 127.0.0.1:40003, 127.0.0.1:40004 ... last 5 nodes: 127.0.0.1:40015, 127.0.0.1:40016, 127.0.0.1:40017, 127.0.0.1:40018, 127.0.0.1:40019
+[driver] created experiment directory: /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_052928/nodes20_rf3_r2_w2_crash_cc2
+[driver] waiting for 20 nodes to be ready...
+[driver] all 20 nodes are ready after 2 attempts
+[driver] prepopulating 200 keys...
+[driver] prepopulation complete.
+[driver] workload started, pid 3145404
+[driver] killing node9 (pid 3145364)
+[driver] killing node18 (pid 3145379)
+[driver] nodes node9, node18 were crashed; please restart cluster if you want to measure post-recovery repair.
+[driver] workload finished. saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_052928/nodes20_rf3_r2_w2_crash_cc2/workload.csv
+[driver] computing consistency + availability metrics...
+[driver] metrics saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_052928/nodes20_rf3_r2_w2_crash_cc2/computed_metrics.json
+[script] experiment done; stopping cluster
+[script] cleaning up cluster
+[cleanup] Found 20 node processes to clean up
+[cleanup] All processes terminated gracefully
+[script] cleaning up cluster
+[cleanup] Found 20 node processes to clean up
+[cleanup] All processes terminated gracefully

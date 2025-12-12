@@ -1,0 +1,33 @@
+[script] launching cluster...
+[script] cluster_procs.json found after 24 attempts
+[script] waiting additional 30 seconds for all nodes to fully start...
+[script] running experiment...
+[driver] loaded cluster from /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_064013/nodes30_rf3_r2_w2_crash_cc5/cluster_procs.json
+[driver] cluster has 30 nodes
+[driver] first 5 nodes: 127.0.0.1:50000, 127.0.0.1:50001, 127.0.0.1:50002, 127.0.0.1:50003, 127.0.0.1:50004 ... last 5 nodes: 127.0.0.1:50025, 127.0.0.1:50026, 127.0.0.1:50027, 127.0.0.1:50028, 127.0.0.1:50029
+[driver] created experiment directory: /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_064013/nodes30_rf3_r2_w2_crash_cc5
+[driver] waiting for 30 nodes to be ready...
+[driver] all 30 nodes are ready after 1 attempts
+[driver] prepopulating 200 keys...
+[driver] prepopulation complete.
+[driver] workload started, pid 3150825
+[driver] crash_count=5, available_nodes=30
+[driver] selected victims: ['node5', 'node8', 'node6', 'node22', 'node12']
+[driver] killing node5 (pid 3150737)
+[driver] killing node8 (pid 3150742)
+[driver] killing node6 (pid 3150738)
+[driver] killing node22 (pid 3150766)
+[driver] killing node12 (pid 3150749)
+[driver] nodes node5, node8, node6, node22, node12 were crashed; please restart cluster if you want to measure post-recovery repair.
+[driver] workload finished. saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_064013/nodes30_rf3_r2_w2_crash_cc5/workload.csv
+[driver] computing consistency + availability metrics...
+[driver] metrics saved to /n/fs/dk-diffusion/repos/dynamo-project/results/suite_20251212_064013/nodes30_rf3_r2_w2_crash_cc5/computed_metrics.json
+[script] experiment done; stopping cluster
+[script] cleaning up cluster
+[cleanup] Found 30 node processes to clean up
+[cleanup] All processes terminated gracefully
+[cleanup] All ports 50000-50029 are free
+[script] cleaning up cluster
+[cleanup] Found 30 node processes to clean up
+[cleanup] All processes terminated gracefully
+[cleanup] All ports 50000-50029 are free
